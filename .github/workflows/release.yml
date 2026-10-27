@@ -1,0 +1,28 @@
+# Publishes a release with the CV attached whenever the PDF changes on main.
+# The portfolio links to releases/latest/download/Kudzai_Matizirofa_CV.pdf,
+# so the newest release is always the one served.
+name: Release CV
+
+on:
+  push:
+    branches: [main]
+    paths: [Kudzai_Matizirofa_CV.pdf]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create release with the PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="cv-$(date -u +%Y.%m.%d)-${{ github.run_number }}"
+          gh release create "$tag" Kudzai_Matizirofa_CV.pdf \
+            --title "CV $(date -u +%Y-%m-%d)" \
+            --notes "CV published from ${GITHUB_SHA::7}." \
+            --latest
